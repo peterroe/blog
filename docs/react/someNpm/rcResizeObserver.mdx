@@ -1,0 +1,50 @@
+---
+sidebar_position: 3
+---
+
+# rc-resize-observer
+
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+:bulb:**rc-resize-observer**用于监听组件的宽高变化
+
+```jsx live
+function Clock(props) {
+    const [width,setWidth] = useState()
+    const [height,setHeight] = useState()
+    const [show,setShow] = useState(false)
+
+    let Component;
+    if(show) {
+        Component = (<div><textarea>box1</textarea></div>)
+    } else {
+        Component = (<textarea>box2</textarea>)
+    }
+    return (
+        <ResizeObserver
+            onResize={
+                ({ width, height }) => {
+                    setWidth(width)
+                    setHeight(height)
+                }}
+            >
+                {Component}
+                <button onClick={() => {setShow(!show)}}>切换</button>
+                <div>长：{height}</div>
+                <div>宽：{width}</div>
+        </ResizeObserver>
+    );
+}
+```
+:point_up:尝试点击上面的按钮，切换`Component`，然后改变**textarea**的大小，你会发现：
+
+* 当组件为内容Box1时，宽不会变化。因为此时，`ResizeObserver`监听的是div的大小，div的宽度默认是父盒子的**100%**不会变，但是高度却会随着textarea的高度变化
+
+* 当组件内容为Box2时，`ResizeObserver`监听的是textare，所以能监听到大小的变化
+
+:::caution
+该组件只能监听子组件的变化，如果你想监听多层，该组件支持嵌套使用
+:::
+
