@@ -1,0 +1,147 @@
+---
+slug: Input
+title: Input
+authors: [lsh]
+tags: [element,input]
+---
+
+export const Image = ({path,style}) => {
+    return (
+        <img style={ {...{boxShadow: "2px 2px 30px #c7ccd7",margin:"20px 0"},...style}} src={path}></img>
+    )
+}
+
+:::danger
+Input 为受控组件，它总会显示 Vue 绑定值。
+
+通常情况下，应当处理 input 事件，并更新组件的绑定值（或使用v-model）。否则，输入框内显示的值将不会改变。
+
+不支持 v-model 修饰符。
+:::
+
+## v-model实现
+
+下面是组件的用法：
+
+```html
+<el-input v-model="input" placeholder="请输入内容"></el-input>
+```
+效果如下：
+
+<Image path="https://img-blog.csdnimg.cn/c70b9b3b8bc148c5979ea1d4790c60ed.png"/>
+
+实现v-model的效果很简单：
+
+```html title="el-input部分源码"
+<input
+    ref="input"
+    @input="handleInput"
+>
+</input>
+
+<script>
+    export default {
+        method: {
+            handleInput(event) {
+                this.$emit('input', event.target.value);
+            }
+        }
+    }
+</script>
+```
+
+注意，因为是受控组件，所以我们不能直接在`<input>`标签上绑定**value**值，[什么是受控/非受控组件](https://zh-hans.reactjs.org/docs/uncontrolled-components.html)
+
+
+`<el-input>`组件在初始化的时候绑定了传入的**value**
+
+```js title="简化后的源码"
+mounted() {
+    this.$refs.input = this.value
+}
+```
+
+当用户输入新的值，我们还需要继续更新`this.$refs.input`和`v-model`绑定的值
+
+```js
+handleInput(event) {
+    this.$emit('input', event.target.value); //向上传递事件改变this.value
+    this.$nextTick(this.setNativeInputValue); //改变this.$refs.input
+}
+```
+
+<Image path="https://img-blog.csdnimg.cn/eb6b8acb711849aca318f66b6b2b9168.gif"/>
+
+受控组件还要满足一些条件，例如，当尝试这样使用`el-input`组件时：
+
+```html
+<el-input :value="username">
+
+</el-input>
+
+<!-- 
+    data() {
+        return {
+            username: 'zhoujielun'
+        }
+    }
+ -->
+```
+
+
+<Image path="https://img-blog.csdnimg.cn/0698e7bc87fd4f2f99eaa5494b17beb5.gif"/>
+
+:point_up:尝试输入和删除都是无法更改值的，因为值完全受控于`el-input`组件，而不是内部的`input`标签
+
+## 可清空
+
+<Image path="https://img-blog.csdnimg.cn/4dfb7df03c54448cbe4aee8c8a84d1e5.gif"/>
+
+完成清空功能有两步
+* 控制icon显隐
+* 清空方法
+
+控制显隐是一个计算属性：
+
+```js
+showClear() {
+    return this.clearable &&  //传入了props
+        !this.inputDisabled &&  //是否disabled
+        !this.readonly &&  //原生属性--只读
+        this.nativeInputValue && //原生input标签的的value
+        (this.focused || this.hovering);
+},
+```
+如果满足条件，会出现icon图标：
+
+```html
+<i v-if="showClear"
+    class="el-input__icon el-icon-circle-close el-input__clear"
+    @mousedown.prevent
+    @click="clear"
+></i>
+```
+
+点击之后，便会清空值：
+
+```js
+clear() {
+    this.$emit('input', ''); //清空
+    this.$emit('change', '');
+    this.$emit('clear');
+},
+```
+
+<Image path="https://img-blog.csdnimg.cn/176ebaca61544257affda74367930839.png"/>
+
+
+
+
+
+
+
+
+
+
+
+

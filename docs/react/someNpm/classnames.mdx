@@ -1,0 +1,115 @@
+---
+sidebar_position: 1
+---
+
+# classnames
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+你可以这样安装`classnames`
+
+<Tabs>
+<TabItem value="Yarn" label="Yarn" default >
+
+```shell
+yarn add classnames
+```
+
+</TabItem>
+<TabItem value="npm" label="npm">
+
+```shell   
+npm install classnames
+```
+
+</TabItem>
+</Tabs>
+
+
+:::caution
+注意，此处是`classnames`，而不是`classname`，这是两个不同的包
+:::
+
+**然后引入**
+
+```js
+import classNames from classnames
+```
+
+**最简单的用法**
+
+:ocean:把多个字符串合并
+
+```js
+classNames('foo', 'bar'); //=> 'foo bar'
+```
+
+**多种表达式类型**
+
+:rainbow:即使是一团糟的表达式，也能转成css类，当然，我希望你的代码不出现像下面那样不规范的类：
+
+```js
+classNames(1, 'one', false, 'two') //=> '1 one two'
+classNames(null, false, 'bar', undefined, 0, 1, { baz: null }, ''); // => 'bar 1'
+```
+
+**以及各种自由的组合**
+
+```js
+classNames('foo', { bar: true }); // => 'foo bar'
+classNames({ 'foo-bar': true }); // => 'foo-bar'
+classNames({ 'foo-bar': false }); // => ''
+classNames({ foo: true }, { bar: true }); // => 'foo bar'
+```
+
+**嵌套的结构会被打平**
+
+```js
+classNames('a', ['b', {c:true, d:false}]) //=> 'a b c
+```
+
+**数组也是合法的**
+
+:heavy_check_mark:支持多种结构，这非常灵活：
+
+```js
+classNames(['box','flex','big'],{ justifCenter:false, red:true} //=> 'box flex red')
+classNames('foo', { bar: true, duck: false }, 'baz', { quux: true }); // => 'foo bar baz quux'
+```
+
+
+:::info
+交换二者的位置也是可以的
+```js
+classNames({box:false, big:true },['box','flex','big']) //=> 'flex big'
+```
+:::
+
+
+**试一试:first_place_medal:**
+
+```css title="提供的三个class类"
+.fontMl {
+    font-size: 30px
+}
+
+.bgGreen {
+    background-color: #25c2a0
+}
+
+.skyblue {
+    color: skyblue
+}
+```
+**尝试修改下面className的参数**:point_down:
+```jsx live
+function MyComponent(props) {
+    const fliterClass = classNames('fontMl',{'bgGreen':false,'skyblue':true})
+    return (
+        <p className={fliterClass}>
+            ⛏在人生的旅途中，有条捷径当然是件好事。但当人生的捷径上人满为患的时候，我们不妨绕点弯路
+        </p>
+    )
+}
+```

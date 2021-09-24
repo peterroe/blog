@@ -1,0 +1,191 @@
+---
+slug: Switch
+title: Switch
+authors: [lsh]
+tags: [element,switch]
+---
+
+export const Image = ({path,style}) => {
+    return (
+        <img style={ {...{boxShadow: "2px 2px 30px #c7ccd7",margin:"20px 0"},...style}} src={path}></img>
+    )
+}
+
+## 基本用法
+
+```html
+<el-switch
+    v-model="value"
+    active-color="#13ce66"
+    inactive-color="#ff4949">
+</el-switch>
+```
+效果：
+
+<Image path="https://img-blog.csdnimg.cn/784c3e13ba184168b356a865dfe92040.gif"/>
+
+## 开关是如何移动的？
+
+原生**html**没有提供**switch**这样的组件给我们，所以这种切换效果是模拟出来的
+
+`el-switch`由两部分组成
+* span背景板
+
+<Image style={{margin:'-10px 0 0 0'}} path="https://img-blog.csdnimg.cn/d41655490c434b79a8e09ee8d2d688ca.png"/>
+
+* span:after 圆点
+
+<Image style={{margin:'-10px 0 0 0'}} path="https://img-blog.csdnimg.cn/b2ebc5e4f4054c6892a6b9df7ce0b727.png"/>
+
+**圆点的默认样式**
+
+圆点以定位的方式存在于span的内部
+
+```css
+.el-switch__core:after {
+    content: "";
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    border-radius: 100%;
+    transition: all .3s;  /* 位置过渡效果 */
+    width: 16px;
+    height: 16px;
+    background-color: #fff;
+}
+```
+
+**另一个状态**
+
+当点击圆点时，添加`ischecked`类，如下的属性将会生效
+
+```css
+.el-switch.is-checked .el-switch__core:after {
+    left: 100%;
+    margin-left: -17px;
+}
+```
+
+上面`css`意味着，新位置是向左偏移100%再给一个负外边距
+
+<Image path="https://img-blog.csdnimg.cn/065b73608d3e487a9b009dfb3baa6ca0.gif"/>
+
+## 状态的切换
+
+```html
+<div
+    class="el-switch"
+    :class="{ 'is-disabled': switchDisabled, 'is-checked': checked }"
+    @click.prevent="switchValue"
+>
+</div>
+```
+点击后触发`swichValue`事件：
+
+```js
+computed: {
+    checked() {  //3.判断当前值是否是有效值
+        return this.value === this.activeValue; //5.值就改变了
+    },
+    switchDisabled() {  //1.判断自己是否有disable属性或者祖级是否有
+        return this.disabled || (this.elForm || {}).disabled;
+    }
+},
+method:{
+    switchValue() {  //2.如果没有disable属性，就触发handleChange方法
+        !this.switchDisabled && this.handleChange();
+    },
+    handleChange(event) {
+        const val = this.checked ? this.inactiveValue : this.activeValue; //给相反的值
+        this.$emit('input', val);  //4.触发事件，父级v-model接收和改变value
+        this.$emit('change', val); //触发事件，用@change监听
+    },
+}
+```
+## 表单校验
+
+el-switch还有一个属性：
+
+<Image path="https://img-blog.csdnimg.cn/99aa7033c4b24fb28e644f03a1a2a280.png"/>
+
+一旦checked属性变化了，触发dispatch方法，[dipatch在Radio中有提及](/element/Radio#radio单选框组实现)
+
+<details>
+  <summary>点击展开</summary>
+  <div>
+    <div>
+        <img src="https://img-blog.csdnimg.cn/aa9ebf68f04e406a802eb005e4b4af11.png"/>
+    </div>
+    
+  </div>
+</details>
+
+```js
+watch: {
+    checked() {
+        this.$refs.input.checked = this.checked;
+        if (this.activeColor || this.inactiveColor) {
+            this.setBackgroundColor();
+        }
+        if (this.validateEvent) {  //校验
+            this.dispatch('ElFormItem', 'el.form.change', [this.value]);
+        }
+    }
+},
+```
+
+```js title="el-form-item部分源码"
+this.$on('el.form.change', this.onFieldChange); //监听组件本身触发的事件
+```
+:::tip
+`checked`既是计算属性又是监听属性，二者重名了
+:::
+
+
+## focus实现
+
+我们注意到，el-switch还可以调用focus方法：
+
+<Image path="https://img-blog.csdnimg.cn/f8b9d942037f40bfafbb6bc327c997e1.png"/>
+
+但是el-switch不是基于像input那样的原生组件封装，哪里来的focus聚焦方法呢？
+
+但其实，el-switch内部存在一个`input[type=checkbox]`标签：
+
+```html title="el-switch部分源码"
+<div class="el-switch">
+    <input
+        class="el-switch__input"
+        type=checkbox
+        ref="input"
+    >
+    <span class="el-switch__core"></span>
+</div>
+```
+
+focus方法来源于mixins：
+```js
+import Focus from 'element-ui/src/mixins/focus';
+
+mixins: [Focus('input'),...]
+```
+focus.js：
+
+```js title="element-ui/src/mixins/focus"
+export default function(ref) {
+  return {
+    methods: {
+      focus() {
+        this.$refs[ref].focus();  
+      }
+    }
+  };
+};
+```
+如此一来，便能够通过checkbox聚焦
+
+但是`input[typpe=checkbox]`本身和组件功能没有太大逻辑关系，更多应该是一个语义化的效果
+
+如果你在在控制台调试**el-switch**的时候，试着删除内部的**input**标签，实际上几乎不会对组件产生影响
+
+<Image path="https://img-blog.csdnimg.cn/c59cb20cf4b24edb89d35f6e7359c224.gif"/>

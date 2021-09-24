@@ -1,0 +1,175 @@
+---
+slug: Col
+title: Col
+authors: [lsh]
+tags: [element,col]
+---
+
+# Col
+
+Col必须搭配Row组件使用
+
+col的属性描述：
+
+export const Image = ({path}) => {
+    return (
+        <img style={{boxShadow: "2px 2px 30px #c7ccd7"}} src={path}></img>
+    )
+}
+
+<Image path="https://img-blog.csdnimg.cn/98bd6d238504410b888227da75d1ce14.png"/>
+
+与`el-row`一样，`el-col`也是采用了`render`函数渲染组件
+
+```js
+render() {
+    return h(this.tag, {
+        class: ['el-col', classList],
+        style
+    }, this.$slots.default);   
+}
+```
+
+可以看到，`classList`和`style`的值没有直接计算出来，因为这两个值的来源比较复杂：
+
+:::info
+Col提供的属性：
+```js
+props: {
+    span: {
+      type: Number,
+      default: 24
+    },
+    tag: {
+      type: String,
+      default: 'div'
+    },
+    offset: Number,
+    pull: Number,
+    push: Number,
+    xs: [Number, Object],
+    sm: [Number, Object],
+    md: [Number, Object],
+    lg: [Number, Object],
+    xl: [Number, Object]
+},
+```
+:::
+
+## :dart:classList数据来源
+
+classList中收集了需要渲染的Css类，来源主要有两部分：
+
+* `'span', 'offset', 'pull', 'push'`
+* `'xs', 'sm', 'md', 'lg', 'xl'`
+
+**第一部分**
+
+```js
+let classList = [];
+
+['span', 'offset', 'pull', 'push'].forEach(prop => {
+    if (this[prop] || this[prop] === 0) {
+    classList.push(
+        prop !== 'span'
+        ? `el-col-${prop}-${this[prop]}`    //渲染el-col-{offect/pull/push}-{number}
+        : `el-col-${this[prop]}`            //渲染el-col-{number}
+    );
+    }
+});
+```
+
+**第二部分**
+
+```js
+['xs', 'sm', 'md', 'lg', 'xl'].forEach(size => {
+      if (typeof this[size] === 'number') {
+        classList.push(`el-col-${size}-${this[size]}`); //渲染el-col-{xs/sm/md/lg/xl}-{number}
+      } else if (typeof this[size] === 'object') {
+        let props = this[size];
+        Object.keys(props).forEach(prop => {
+          classList.push(
+            prop !== 'span'
+              ? `el-col-${size}-${prop}-${props[prop]}`  //渲染el-col-{xs/sm/md/lg/xl}-{offect/push/pull}-{number}
+              : `el-col-${size}-${props[prop]}`   //渲染el-col-{xs/sm/md/lg/xl}-{number}
+          );
+        });
+      }
+    });
+```
+
+## :tennis:style数据来源
+
+style的来源很简单：
+
+```javascript
+let style = {}
+if (this.gutter) {
+      style.paddingLeft = this.gutter / 2 + 'px';
+      style.paddingRight = style.paddingLeft;
+}
+```
+上面的`gutter`是应该是`el-row`组件的属性，我们可以通过`this.$parent.gutter`拿到
+
+⚠但是！！！⚠
+
+一般来说，组件的结构都是`el-row`紧挨着`el-col`的，像这样
+```html
+<el-row>
+    <el-col>
+        
+    </el-col>
+    <el-col>
+       
+    </el-col>
+</el-row>
+```
+但有些人可能喜欢这样使用
+```html
+<el-row>
+    <div>
+        <el-col>
+        </el-col>
+    </div>
+    <div>
+        <el-col>
+        </el-col>
+    </div>
+</el-row>
+```
+
+所以考虑到这种情况，为了更加灵活，**Element**采取了更加完善的做法:
+
+
+```js {4-6}
+computed: {
+    gutter() {
+        let parent = this.$parent;
+        while (parent && parent.$options.componentName !== 'ElRow') { 
+            parent = parent.$parent;  //向上递归找到El-Row
+        }
+        return parent ? parent.gutter : 0;
+    }
+},
+```
+
+## :palm_tree:关于gutter
+:::tip
+你可能注意到了在[`el-row`](/element/Row)一文中留下了一个疑问，为什么`margin`在el-row中是负值？
+:::
+
+这是为了弥补如下代码造成的缺陷
+```js {2-3}
+if (this.gutter) {
+    style.paddingLeft = this.gutter / 2 + 'px';
+    style.paddingRight = style.paddingLeft;
+}
+```
+上面的代码意味着，`el-row`组件是始终有左右`padding`的，左右两边内容无法贴边，像这样：
+
+<Image path="https://img-blog.csdnimg.cn/24934b31ff1b4ab88a4e2af0c945c9aa.png"/>
+
+
+而给`el-row`负`margin`，两边的`el-col`内容贴边了，就可以达到这种效果：
+<Image path="https://img-blog.csdnimg.cn/521b203e68f94fd18ba102a80c7497b3.png"/>
+
