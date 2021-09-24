@@ -1,0 +1,39 @@
+---
+sideBar_position: 1
+---
+
+# Array.prototype.filter()
+
+filter() 方法创建一个新数组, 其包含通过所提供函数实现的测试的所有元素
+
+```js
+const words = ['spray', 'limit', 'elite', 'exuberant', 'destruction', 'present'];
+
+const result = words.filter(word => word.length > 6);
+
+console.log(result);
+// expected output: Array ["exuberant", "destruction", "present"]
+```
+
+如果你了解回调函数（callback），那么实现思路很简单了：
+
+✔在合适的时机调用`callback`
+
+```js title="实现思路"
+Array.prototype.$fliter = function (cb) {
+    let arr
+    for(let i = 0; i < this.length; i++) {
+        let target = this[i]
+        if(cb(target)) {
+            arr.push(target)
+        }
+    }
+    return arr
+}
+```
+
+## 练习
+
+试着手写：
+* `Array.prototype.$some`
+* `Array.prototype.$every`

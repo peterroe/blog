@@ -1,0 +1,72 @@
+---
+sideBar_position: 2
+---
+
+# Array.prototype.flat()
+
+flat() 方法会按照一个可指定的深度递归遍历数组，并将所有元素与遍历到的子数组中的元素合并为一个新数组返回
+
+```js
+const arr1 = [0, 1, 2, [3, 4]];
+
+console.log(arr1.flat());
+// expected output: [0, 1, 2, 3, 4]
+
+const arr2 = [0, 1, 2, [[[3, 4]]]];
+
+console.log(arr2.flat(2));
+// expected output: [0, 1, 2, [3, 4]]
+```
+
+flat()的手写实现也是面试的考点也是难点，接下来将会带你一步一步实现：
+
+## 实现打平一层数组
+
+**目标**
+```js
+[1, 2, [3 ,4]] => [1, 2, 3, 4]
+```
+
+**实现**
+
+简单思路就是谁是数组就打平谁：
+
+```js
+Array.prototype.$flat = function () {
+    for(let i = 0; i < this.length; i++) {
+        if(Array.isArray(this[i])) {
+            this.splice(i,1,...this[i])
+        }
+    }
+}
+```
+
+:::tip
+除了利用扩展运算符(...)之外
+
+Array.prototype.concat()也自带展开一层的能力
+:::
+
+所以可以这样实现：
+
+```js
+Array.prototype.$flat = function () {
+    return this.reduce((pre,cur) => this.concat(cur),[])
+}
+```
+
+二者结合更为简单：
+
+```js
+Array.prototype.$flat = function () {
+    return [].concat(...this)
+}
+```
+
+## 打平多层
+
+在不确定多少层的情况下，用递归是一个不错的选择，所以我们的思路就是递归
+
+
+
+
