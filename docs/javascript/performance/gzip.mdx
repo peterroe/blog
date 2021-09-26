@@ -150,16 +150,6 @@ server {
     server_name  localhost;
     #开启和关闭gzip模式
     gzip on;
-     # 无条件压缩
-    gzip_proxied any;
-    #gizp压缩起点，文件大于1k才进行压缩
-    gzip_min_length 1k;
-    
-    # gzip 压缩级别，1-9，数字越大压缩的越好，也越占用CPU时间
-    gzip_comp_level 6;
-    
-    # 进行压缩的文件类型。
-    gzip_types text/plain application/javascript application/x-javascript text/css application/xml text/xml text/javascript application/json image/png image/gif image/jpeg;
     
     location / {
         root   C:/Users/Admin/Desktop/myproject/dist;
@@ -167,7 +157,32 @@ server {
     }
 }
 ```
+## nginx压缩
 
+:::tip
+nginx也可以主动进行压缩，但会消耗一定的CPU，配置如下
+:::
+ 
+```py
+server {
+    listen       82;
+    server_name  localhost;
+    #开启和关闭gzip模式
+    gzip on;
+    #gizp压缩起点，文件大于1k才进行压缩
+    gzip_min_length 1k;
+        
+    # gzip 压缩级别，1-9，数字越大压缩的越好，也越占用CPU时间
+    gzip_comp_level 6;
+        
+    # 进行压缩的文件类型。
+    gzip_types text/plain application/javascript application/x-javascript text/css application/xml text/xml text/javascript application/json image/png image/gif image/jpeg;
 
+    location / {
+        root   C:/Users/Admin/Desktop/myproject/dist;
+        index  index.html index.htm;
+    }
+}
+```
 
 
