@@ -28,6 +28,7 @@ module.exports = {
                 // { to: '/blog', label: 'Blog', position: 'left' },
                 { to: '/element', label: 'Element源码系列', position: 'left' },
                 { to: '/antDesign', label: 'AntDesign源码系列', position: 'left' },
+                { to: '/vue2', label: 'Vue2源码系列', position: 'left' },
                 {
                     href: 'https://github.com/facebook/docusaurus',
                     label: 'GitHub',
@@ -133,6 +134,14 @@ module.exports = {
                 id: 'antDesign',
                 routeBasePath: '/antDesign',
                 path: './antDesign',
+            },
+        ],
+        [
+            '@docusaurus/plugin-content-blog',
+            {
+                id: 'vue',
+                routeBasePath: '/vue2',
+                path: './vue2',
             },
         ],
     ],
