@@ -2,34 +2,11 @@
 sidebar_position: 1
 ---
 
-# Tutorial Intro
+# 关于站点
 
-Let's discover **Docusaurus in less than 5 minutes**.
+这里会记录我的在前端领域的探索，如果你希望加入我们，或者想在这里发布文章
 
-## Getting Started
+>:mailbox_closed: peterroe@163.com 欢迎小伙伴投稿~
 
-Get started by **creating a new site**.
+## :rocket:Getting Started
 
-Or **try Docusaurus immediately** with **[docusaurus.new](https://docusaurus.new)**.
-
-## Generate a new site
-
-Generate a new Docusaurus site using the **classic template**:
-
-```shell
-npx @docusaurus/init@latest init my-website classic
-```
-
-## Start your site
-
-Run the development server:
-
-```shell
-cd my-website
-
-npx docusaurus start
-```
-
-Your site starts at `http://localhost:3000`.
-
-Open `docs/intro.md` and edit some lines: the site **reloads automatically** and display your changes.

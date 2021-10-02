@@ -23,14 +23,14 @@ module.exports = {
                     type: 'doc',
                     docId: 'intro',
                     position: 'left',
-                    label: 'Tutorial',
+                    label: '日志',
                 },
                 // { to: '/blog', label: 'Blog', position: 'left' },
                 { to: '/element', label: 'Element源码系列', position: 'left' },
                 { to: '/antDesign', label: 'AntDesign源码系列', position: 'left' },
                 { to: '/vue2', label: 'Vue2源码系列', position: 'left' },
                 {
-                    href: 'https://github.com/facebook/docusaurus',
+                    href: 'https://github.com/2917292081',
                     label: 'GitHub',
                     position: 'right',
                 },
@@ -41,37 +41,41 @@ module.exports = {
             links: [{
                     title: 'Docs',
                     items: [{
-                        label: 'Tutorial',
+                        label: '日志',
                         to: '/docs/intro',
+                    }, {
+                        label: 'Element源码系列',
+                        to: '/element',
+                    }, {
+                        label: 'AntDesign源码系列',
+                        to: '/antDesign',
+                    }, {
+                        label: 'Vue2源码系列',
+                        to: '/vue2',
                     }, ],
                 },
                 {
-                    title: 'Community',
+                    title: 'About',
                     items: [{
-                            label: 'Stack Overflow',
-                            href: 'https://stackoverflow.com/questions/tagged/docusaurus',
+                            label: 'QQ: 291729201',
+                            href: '#',
                         },
                         {
-                            label: 'Discord',
-                            href: 'https://discordapp.com/invite/docusaurus',
+                            label: 'VX: peterroe163com',
+                            href: '#',
                         },
                         {
-                            label: 'Twitter',
-                            href: 'https://twitter.com/docusaurus',
+                            label: 'Email: peterroe@163.com',
+                            href: '#',
                         },
                     ],
                 },
                 {
-                    title: 'More',
+                    title: 'Others',
                     items: [{
-                            label: 'Blog',
-                            to: '/blog',
-                        },
-                        {
-                            label: 'GitHub',
-                            href: 'https://github.com/facebook/docusaurus',
-                        },
-                    ],
+                        label: 'GitHub',
+                        href: 'https://github.com/2917292081',
+                    }, ],
                 },
             ],
             copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,

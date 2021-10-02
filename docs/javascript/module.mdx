@@ -1,0 +1,58 @@
+---
+sideBar_position: 6
+---
+
+# 聊一聊JavaScript模块化
+
+:rocket:这几年前端蓬勃发展，前端从模版引擎调用过渡到框架组件，可能很多人会分不清**组件**和**模块**的区别
+
+因为看起来**组件**和**模块**有很多相似点
+* 都是一段代码的集合，即都是被封装起来的
+* 组件间可以相互调用，模块间也可以相互调用
+
+但是它们的职责是不同的，简而言之就是：
+
+:::tip
+组件解决了代码复用的问题，模块解决了分而治之的问题
+:::
+
+如果你还不太理解上面的概念，也不影响接下来的阅读，但你应该清楚模块是什么
+
+**JavaScript**的模块演化进程很缓慢，因为最开始这门语言就没有模块化（感谢NodeJs带来的生态）
+
+## Script标签和闭包
+
+在早期，JavaScript被嵌入到HTML`<script>`标签中
+
+```html
+<script>
+    console.log('UFO')
+</script>
+```
+
+这会产生有什么问题呢？
+
+例如`Even You`写了一个模块，这个函数有上千行代码，在这里我们假设只有几行，那么我想要用它的代码，我直接拷贝过来：
+
+```html
+<body>
+    <script>  //Evan的代码
+        var count = 0
+        function add() {
+            return  ++count
+        }
+    </script>
+    <script>  //我的代码
+        var box = docoment.getElementById('#box')
+        box.onclick = function () {
+            box.innerText = add()
+        }
+
+        //由于我不知道count的存在，毕竟有几千行代码
+        //接下来做其他事情就有可能改变count的值
+        var count = 10 
+    </script>
+</body>
+```
+
+
