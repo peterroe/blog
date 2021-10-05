@@ -1,0 +1,133 @@
+---
+sideBar_position: 1
+---
+
+# 位运算
+
+:::tip
+位运算在处理数字间的关系中总是表现出色
+:::
+
+## 获得目标比特位
+
+```javascript
+function getBit(number, bitPosition) {
+    return (number >> bitPosition) & 1
+}
+```
+>:point_right:该方法向右移动目标位到最右边，即位数组的第0个位置上。然后在该数上与形如 0001的二进制形式的数进行ADD操作。这会清理掉除了目标位的所有其它位的数据。如果目标位是1，那么结果就是1，反之，结果是0
+
+**解释**
+
+假设我们要获得数字`23`的第三个比特位，那么就是向右边移动2位
+
+所以**number=23、bitPosition=2**
+
+```js
+//所以:
+23 >> 2 & 1
+//等价于:
+(10111)₂ >> 2 & 1
+//等价于为:
+(101)₂ & 1
+//位运算结果:
+1
+```
+## 把目标位设置为1
+
+```js
+function setBit(number,bitPosition) {
+    return (1 << bitPosition) && number
+}
+```
+>:dart:该方法把1向左移动了bitPosition位，生成了一个二进制形如00100的值。然后我们拿该值与目标数字进行OR操作，就能把目标位设置位1而不影响其它位
+
+**解释**
+
+假设**number=23、bitPosition=3**
+
+```js
+1 << 3 & 23
+//等价于:
+(1000)₂ << 3 & (10111)₂
+//等价于为:
+(1000)₂ & (10111)₂
+//位运算结果:
+(11111)₂
+//十进制：
+31
+```
+
+## 把目标位设置为0
+
+```js
+function clearBit() {
+    return ~(1 << bitPosition) & number
+}
+```
+>该方法把1向左移动了bitPosition位，生成了一个二进制形如00100的值。然后反转每一位的数字，得到一个二进制形如11011的值。接着与目标值进行ADD操作，就能清除掉目标位的值
+
+**~取反操作**
+
+~操作会将二进制位逐位取反，包括符号位
+
+## 把目标为设置为0或1
+
+```js
+function updateBit(number,bitPosition,bitValue) {
+    (bitValue <<< bitPosition) |  //设置目标值
+    (number & ~(1 << bitPosition)) //清除目标值
+}
+```
+
+>该方法组合了`ClearBit`和`SetBit`
+
+**为什么要清除目标值？直接设置不行吗？**
+
+答案不行的，因为我们不知道目标位（假设为`X`）是1还是0，直接计算就会有不同的结果
+```js
+X | 0 = 0 //(X = 0)
+X | 0 = 1 //(X = 1)
+X | 1 = 0 //(X = 1)
+X | 1 = 1 //(X = 1)
+```
+而我们并不关心`X`原来是0还是1，所以先把`X`值置为零，就可以得到绝对正确的结果
+```js
+X | 0 = 0 //(X = 0)
+X | 1 = 1 //(X = 0)
+```
+
+## 检测某一个数奇偶性
+```js
+function isOdd(number) {
+    return number & 1
+}
+```
+>奇数的最后一位一定为1
+
+## 数字本身乘2
+```js
+function mutiplyByTwo(number) {
+    return number << 1
+}
+```
+
+>该方法将原始数字向左移动一位。因此所有位都将乘以2，因此数字本身也将乘以2
+
+## 数字本身除2
+```js
+function divideByTwo(number) {
+    return number >> 1
+}
+```
+
+>该方法将原始数字向左移动一位。因此所有位都将乘以2，因此数字本身也将乘以2
+
+## 改变数字符号
+```js
+function switchSign(number) {
+  return ~number + 1;
+}
+
+```
+>该方法将正数变成负数，反之亦然。为了做到这一点，它使用了“二进制补码”的方法，即取反所有位然后加1.
