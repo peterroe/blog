@@ -30,7 +30,7 @@ module.exports = {
                 { to: '/antDesign', label: 'AntDesign源码系列', position: 'left' },
                 { to: '/vue2', label: 'Vue2源码系列', position: 'left' },
                 {
-                    href: 'https://github.com/2917292081',
+                    href: 'https://github.com/peterroe',
                     label: 'GitHub',
                     position: 'right',
                 },
@@ -74,7 +74,7 @@ module.exports = {
                     title: 'Others',
                     items: [{
                         label: 'GitHub',
-                        href: 'https://github.com/2917292081',
+                        href: 'https://github.com/peterroe',
                     }, ],
                 },
             ],
