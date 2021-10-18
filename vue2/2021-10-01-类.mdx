@@ -1,0 +1,132 @@
+---
+slug: 最简单的开始
+title: 最简单的开始
+authors: lsh
+tags: [vue2]
+---
+
+:rocket:最简单的vue用法是这样的：
+
+```html
+<body>
+    <div id="app"></div>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                name: 'Peter Roe',
+                age: 23,
+            },
+            template: `
+                <div>姓名：{name}</div>
+                <div>年龄：{age}</div>
+            `
+        })
+    </script>
+</body>
+```
+如果我们想要单纯实现以上的需求，不用考虑其他的用法，我们应该如何去实现呢:upside_down_face:？
+
+仔细观察下面使用Vue时传入的选项，分别传入了三个属性`el`、`data`、`template`：
+```js {2,3,7}
+new Vue({
+    el: '#app',
+    data: {
+        name: 'Peter Roe',
+        age: 23,
+    },
+    template: `
+        <div>姓名：{name}</div>
+        <div>年龄：{age}</div>
+    `
+})
+```
+我们了解到：
+
+* `el`选项决定了模版要挂载到哪个**DOM**元素下面
+* `data`选项决定了模版中可能会使用到的数据
+* `template`选项决定了挂载的模版
+
+有两点是容易实现的：
+
+`el`选项值是一个ID选择器，因此直接用`document.querySelector`获取**DOM**元素即可
+
+`template`选项的值直接替换掉`DOM.innerHTML`的值
+
+```js
+function Vue({
+    template,
+    data,
+    el
+}) {
+    let dom = document.querySelector(el) //获取el
+    dom.innerHTML = template   //模版替换
+}
+```
+
+关键在于如何把`data`的数据映射到模版中去？
+
+好在我们有JS正则表达式，索性就直接正则替换了吧！:clap:
+
+```js {7-9}
+function Vue({
+    template,
+    data,
+    el
+}) {
+    let dom = document.querySelector(el)
+    Object.entries(data).forEach(item => {  //在模版替换前，利用正则填充值
+        template = template.replace(`\{${item[0]}\}`, item[1])
+    })
+    dom.innerHTML = template
+}
+```
+哇！竟然有如此好的方法就完成了看似的很难完成的题:wave:
+
+接下来我们将构造函数嵌入HTML测试一下：
+```html
+<body>
+    <div id="app"></div>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                name: 'Peter Roe',
+                age: 23,
+            },
+            template: `
+                <div>姓名：{name}</div>
+                <div>年龄：{age}</div>
+            `
+        })
+        function Vue({
+            template,
+            data,
+            el
+        }) {
+            let dom = document.querySelector(el)
+            Object.entries(data).forEach(item => {
+                template = template.replace(`\{${item[0]}\}`, item[1])
+            })
+            dom.innerHTML = template
+        }
+    </script>
+</body>
+```
+成功渲染：
+
+export const Image = ({path}) => {
+    return (
+        <img style={{margin:"10px 0",boxShadow: "2px 2px 30px #c7ccd7"}} src={path}></img>
+    )
+}
+
+<Image path="https://img-blog.csdnimg.cn/84fe568c89c947d38519a8fa4408041d.png"/>
+
+虽然我们成功的实现了一个渲染，但是只靠正则替换能实现的功能非常有限，存在大量不足：
+
+* 无法替换对象和数组中的数据（例如`obj.name`、`arr[0]`）
+* 无法实现循环、条件控制等
+* ...
+
+后面我们将会学习到如何编译模版来获取更好的替换，事实上，Vue也正是这样做的！
