@@ -23,17 +23,10 @@ module.exports = {
                     type: 'doc',
                     docId: 'intro',
                     position: 'left',
-                    label: '日志',
+                    label: '前端技术',
                 },
                 // { to: '/blog', label: 'Blog', position: 'left' },
-                { to: '/element', label: 'Element源码系列', position: 'left' },
-                { to: '/antDesign', label: 'AntDesign源码系列', position: 'left' },
-                { to: '/vue2', label: 'Vue2源码系列', position: 'left' },
-                {
-                    href: 'https://github.com/peterroe',
-                    label: 'GitHub',
-                    position: 'right',
-                },
+                { to: '/gossip', label: '生活与创作', position: 'left' },
             ],
         },
         footer: {
@@ -41,34 +34,19 @@ module.exports = {
             links: [{
                     title: 'Docs',
                     items: [{
-                        label: '日志',
+                        label: '前端技术',
                         to: '/docs/intro',
                     }, {
-                        label: 'Element源码系列',
-                        to: '/element',
-                    }, {
-                        label: 'AntDesign源码系列',
-                        to: '/antDesign',
-                    }, {
-                        label: 'Vue2源码系列',
-                        to: '/vue2',
-                    }, ],
+                        label: '生活与创作',
+                        to: '/gossip',
+                    }],
                 },
                 {
                     title: 'About',
                     items: [{
-                            label: 'QQ: 291729201',
-                            href: '#',
-                        },
-                        {
-                            label: 'VX: peterroe163com',
-                            href: '#',
-                        },
-                        {
-                            label: 'Email: peterroe@163.com',
-                            href: '#',
-                        },
-                    ],
+                        label: '📧: peterroe@163.com',
+                        href: '#',
+                    }, ],
                 },
                 {
                     title: 'Others',
@@ -102,7 +80,7 @@ module.exports = {
                     // Please change this to your repo.
                     editUrl: 'https://github.com/facebook/docusaurus/edit/main/website/blog/',
                 },
-                element: {
+                gossip: {
                     showReadingTime: true,
                     // Please change this to your repo.
                     editUrl: 'https://github.com/facebook/docusaurus/edit/main/website/blog/',
@@ -146,6 +124,14 @@ module.exports = {
                 id: 'vue',
                 routeBasePath: '/vue2',
                 path: './vue2',
+            },
+        ],
+        [
+            '@docusaurus/plugin-content-blog',
+            {
+                id: 'gossip',
+                routeBasePath: '/gossip',
+                path: './gossip',
             },
         ],
     ],
