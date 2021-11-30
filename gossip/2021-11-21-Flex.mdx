@@ -1,0 +1,252 @@
+---
+slug: flex布局
+title: flex布局
+authors: peterroe
+tags: [flex布局]
+---
+
+
+## flex布局
+
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+在传统的布局中，布局都基于**盒模型**，依赖与`display`+`position`+`float`实现,但对于某些复杂的布局就不容易实现，例如垂直居中
+
+:bow_and_arrow:但随着前端技术的发展，一种被成为`flex`的布局逐渐流行了起来
+
+## 基本概念
+
+采用 Flex 布局的元素，称为 Flex 容器（flex container），简称"容器"。它的所有子元素自动成为容器成员，称为 Flex 项目（flex item），简称"项目"。
+
+![截取自阮一峰](https://www.ruanyifeng.com/blogimg/asset/2015/bg2015071004.png)
+
+容器默认存在两根轴：水平的主轴（main axis）和垂直的交叉轴（cross axis）。主轴的开始位置（与边框的交叉点）叫做`main start`，结束位置叫做`main end`；交叉轴的开始位置叫做`cross start`，结束位置叫做`cross end`。
+
+项目默认沿主轴排列。单个项目占据的主轴空间叫做`main size`，占据的交叉轴空间叫做`cross size`
+
+<!-- :point_right:一般我们称flex是Css属性diplay的属性值
+
+可以为任意一个**容器**添加这样的属性: -->
+
+## 使用flex布局
+
+```css
+.box {
+    display: flex
+}
+```
+设置`flex`布局后，**子元素**的`float、clear、vertical-aligin`属性将失效
+
+## 容器的属性
+
+:::info
+容器上可设置6个属性：
+* flex-direction
+* flex-wrap
+* flex-flow
+* justify-content
+* align-content
+* align-items
+:::
+
+## :bowling:flex-direction
+
+`flex-direction`确定主轴的方向，默认是`row`
+
+```css
+.box {
+  flex-direction: row | row-reverse | column | column-reverse;
+}
+```
+
+主轴的方向意味着，元素会根据此方向，位置从小到大排列，如下的Flow图：
+
+<Tabs>
+<TabItem value="flex-start" label="row" default>
+
+```shell
+┌─┐   ┌─┐   ┌─┐
+│1│   │2│   │3│
+└─┘   └─┘   └─┘
+──────────────────►
+
+
+
+
+
+
+
+
+```
+
+</TabItem>
+<TabItem value="row-reverse" label="row-reverse" >
+
+```shell
+                                                                                              ┌─┐   ┌─┐   ┌─┐
+                                                                                              │3│   │2│   │1│
+                                                                                              └─┘   └─┘   └─┘
+                                                                                         ◄──────────────────
+
+
+
+ 
+
+
+
+
+```
+
+</TabItem>
+<TabItem value="column" label="column">
+
+```js
+┌─┐  │
+│1│  │
+└─┘  │
+     │
+┌─┐  │
+│2│  │
+└─┘  │
+     │
+┌─┐  │
+│3│  │
+└─┘  ▼
+
+```
+
+</TabItem>
+<TabItem value="column-reverse" label="column-reverse">
+
+```js
+
+┌─┐  ▲
+│3│  │
+└─┘  │
+     │
+┌─┐  │
+│2│  │
+└─┘  │
+     │
+┌─┐  │
+│1│  │
+└─┘  
+```
+
+</TabItem>
+</Tabs>
+
+## :beer:flex-wrap
+
+**flex-wrap**的定义是：如果一条轴线排不下，如何换行？
+
+默认值是**nowrap**，代表不换行
+
+* `nowrap` 意味着如果元素排不下一行，会覆盖子项的宽度，强行在一行展示
+* `wrap` 意味着排不下一行会另起一行，第一行在上方
+* `wrap-reverse` 意味着第一行在下方
+
+有三个可选值
+```css
+.box {
+     flex-wrap: wrap | nowrap | wrap-reverse
+}
+```
+
+<Tabs>
+<TabItem value="wrap" label="wrap" default>
+
+```shell
+┌────────────────────┐   ┌────────────────────┐   ┌────────────────────┐   ┌────────────────────┐
+│         1          │   │          2         │   │         3          │   │         4          │ 
+└────────────────────┘   └────────────────────┘   └────────────────────┘   └────────────────────┘
+┌────────────────────┐
+│         5          │
+└────────────────────┘
+```
+
+</TabItem>
+<TabItem value="nowrap" label="nowrap">
+
+```shell
+┌──────────────────┐  ┌──────────────────┐  ┌───────────────────┐  ┌──────────────────┐  ┌──────────────────┐
+│        1         │  │        2         │  │         3         │  │        4         │  │        5         │ 
+└──────────────────┘  └──────────────────┘  └───────────────────┘  └──────────────────┘  └──────────────────┘
+
+
+
+```
+
+</TabItem>
+<TabItem value="wrap-reserve" label="wrap-reserve">
+
+```shell
+┌────────────────────┐
+│         5          │
+└────────────────────┘
+┌────────────────────┐   ┌────────────────────┐   ┌────────────────────┐   ┌────────────────────┐
+│         1          │   │          2         │   │         3          │   │         4          │ 
+└────────────────────┘   └────────────────────┘   └────────────────────┘   └────────────────────┘
+```
+
+</TabItem>
+</Tabs>
+
+## :art:flex-flow
+
+`flex-flow`属性是`flex-direction`属性和`flex-wrap`属性的简写形式，默认值为`row nowrap`
+
+```css
+.box {
+     flex-flow: row nowrap
+}
+```
+
+## :fried_egg:justify-content
+
+`justify-content`属性定义了项目在主轴上的对齐方式
+
+默认是`flex-start`，可选值有：
+
+```css
+.box {
+     justify-content: flex-start | flex-end | center | space-between | space-around
+}
+```
+
+<Tabs>
+<TabItem value="flex-start" label="flex-start" default>
+
+```shell
+┌────────────────────┐   ┌────────────────────┐   ┌────────────────────┐
+│         1          │   │          2         │   │         3          │
+└────────────────────┘   └────────────────────┘   └────────────────────┘
+```
+
+</TabItem>
+<TabItem value="flex-end" label="flex-end">
+
+```shell
+                                      ┌────────────────────┐   ┌────────────────────┐   ┌────────────────────┐
+                                      │         1          │   │          2         │   │         3          │
+                                      └────────────────────┘   └────────────────────┘   └────────────────────┘
+```
+
+</TabItem>
+<TabItem value="center" label="center">
+
+```shell
+                  ┌────────────────────┐   ┌────────────────────┐   ┌────────────────────┐
+                  │         1          │   │          2         │   │         3          │
+                  └────────────────────┘   └────────────────────┘   └────────────────────┘
+```
+
+</TabItem>
+</Tabs>
+
+import Container from './components/Container.jsx'
+
+<Container />
+
+I can write **Markdown** alongside my _JSX_!

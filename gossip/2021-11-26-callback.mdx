@@ -1,0 +1,89 @@
+---
+slug: 回调模式
+title: 回调模式
+authors: peterroe
+tags: [回调模式]
+---
+
+
+## 回调模式
+
+## 引言
+回调是Node.js独特的编程风格印记。回调是被调用来传播操作结果的函数，这正是我们在处理异步操作时所需要的，它们会替代总是同步执行的return指令。
+
+JavaScript是一种很好的表示回调的语言，因为如你所见，**函数首先是类对象，可以很容易的分配给变量**，作为参数传递，从另一个函数调用返回或储存到数据结构。
+
+例如，在以往的语言特性中，我们总会认为return语句是一个函数的结束：
+```javascript
+function add(a, b) {
+    return a + b
+}
+console.log(add(2, 3)) //=> 5
+```
+但是JavaScript可以将函数作为参数，形成一个作用域，而不仅仅是在一个函数中调用另一个函数那么简单
+```javascript
+//CPS
+function add(a, b, fn) {
+    fn(a + b)
+    return undefined //默认返回undefined
+}
+function csl(value) {
+    console.log(value)
+}
+add(2, 3, csl)  //=> 5
+```
+
+另一个实现回调的理想构造的**闭包**。使用闭包，我们实际上可以引用创建函数的环境，可以始终维持异步操作被请求时的上下文，不用关系他的回调被调用的实现或地点
+
+## CPS(Continuation Passing Style)
+在JavaScript中，回调是一个作为参数传递给另一个函数的函数，当操作完成时将调用该结果。在函数编程中，这种传播结果的方式被成为CPS。这是一个通用的概念，它并不总是与异步操作相关联，例如上面的一段代码就是`同步CPS`，与之相对的是`异步CPS`，
+
+为了引入异步的CPS，我们再将上面的同步CPS函数稍微改造一下:
+```javascript
+function add(a, b, fn) {
+    fn(a + b)
+}
+console.log('before')
+add(2, 3, (value) => console.log('value: ' + value))
+console.log('after')
+
+/*输出：
+	before
+	value: 5
+	after
+*/
+```
+事实上，如上的代码设计并没有特别的地方，现在考虑异步CPS的情况：
+```javascript
+function add(a, b, fn) {
+    setTimeout(() => {
+        fn(a + b)
+    }, 0)
+}
+console.log('before')
+add(2, 3, (value) => console.log('value: ' + value))
+console.log('after')
+/*输出：
+	before
+	after
+	value: 5
+*/
+```
+由于`setTimeout`是异步函数，它会等主线程执行完了再执行，因此是最后输出，异步CPS的价值就体现出来了
++ 作为回调函数，可以始终维持异步操作被请求时的上下文：
++ 作为异步函数，可以不阻塞地继续执行代码
+
+实际上，CPS的影响和作用并非那么简单，随着我们对异步编程的逐渐深入，日后我们将会看到它的强大
+
+## 非CPS回调
+
+`并非把函数当参数传进了另一个函数中就成为了GPS`，在有些情况下，回调参数的存在可能会让我们认为这个函数是异步的或使用CPS，实际上并不总是这个样子
+```javascript
+console.log([2, 4, 6, 8].map(it => it + 2)) //=> [ 4, 6, 8, 10 ]
+```
+这里的回调函数只是用来遍历数组元素的，CPS的一个重要特征是
++ 传递操作结果
+
+是否使用回调通常会在API文档中清除地说明
+
+

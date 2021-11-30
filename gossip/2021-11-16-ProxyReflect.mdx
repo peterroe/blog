@@ -1,0 +1,379 @@
+---
+slug: 代理与反射
+title: 代理与反射
+authors: peterroe
+tags: [代理与反射]
+---
+
+
+## 代理与反射
+
+>引言： 代理与反射听起来像是javaScript不同于其他语言的独有特性，从某些方面来说，代理类似C++的指针，但这里先不讨论它的定义。接下来给出几个例子，就很容易理解了
+
+## 创建空代理
+```javascript
+let target = {
+    name: 'lihua',
+    age: 18,
+    array: [1, 2, 6]
+}
+let handler = {}
+
+let proxy = new Proxy(target, handler)
+
+//证明proxy与target的属性引用的是同一块地址，哪怕是原始值的也是同一个值
+console.log(target.array === proxy.array) //true 
+proxy.age = 45
+console.log(target.age === proxy.age) //true
+
+//相等可以用来区分代理和反射
+console.log(proxy === target)  //false ：证明proxy与target并不是指向同
+一个地址
+
+//Proxy.prototype是undefined
+```
+代理是使用Proxy构造函数创建的，这个构造函数接收两个对象，缺少任何一个参数都会抛出`TypeError`。
+
+最简单的代理就是像上面空代理，即除了作为一个抽象的目标对象，什么也不做，类似与如下的行为
+```javascript
+let a = 'name'
+let b = [2, 4]
+let target = {
+    a,
+    b
+}
+let proxy = {
+    a,
+    b
+}
+console.log(target.b === proxy.b)  //true
+console.log(target === proxy)	//false
+```
+
+## 定义捕获器
+例如，可以定义一个`get()`捕获器，**当试图访问target的属性的时候**，实际上获得的值来源与`hander`的`get()`返回值
+```javascript
+let target = {
+    name: 'lihua'
+}
+let handler = {
+    get() {
+        return 'handle over'
+    }
+}
+let proxy = new Proxy(target, handler)
+console.log(proxy.name) //handle over
+```
+注意上文加粗的字体（当试图访问target的属性的时候），那假如我们不访问属性呢？
+
+那**proxy**的属性值就不会被`hander`处理：
+
+```javascript
+let target = {
+    name: 'Vue'
+}
+let handler = {
+    get() {
+        return 'React'
+    }
+}
+let proxy = new Proxy(target, handler)
+
+console.log(proxy) 	// { name: 'Vue' }
+console.log(proxy.name) // React
+```
+这是与普通对象相较起来很匪夷所思的现象
+:::caution
+打印`proxy`对象发现有`name`属性，值是**Vue**，但是试图访问的时候却发现**name**的值是**React**
+:::
+接下来更进一步了解`hander`对象与`get()`捕获器
+## 捕获器参数和反射API
+所有捕获器都可以访问响应的参数，基于这些参数可以重建被捕获方法的原始行为，比如，`get()`捕获器会接收到三个参数：
+* 🦄 目标对象
+* 🐾 要查询的属性
+* 🐴 代理对象
+
+```javascript
+let target = {
+    name: 'lihua',
+    age: 18,
+    array: [1, 2, 6]
+}
+let handler = {
+	//接收三个参数
+    get(trapTarget, property, reciver) {
+        console.log(trapTarget === target)
+        console.log(property)
+        console.log(reciver === proxy)
+        return undefined
+    }
+}
+let proxy = new Proxy(target, handler)
+//如上文所说，如果我们不妨问proxy的属性，hander里的get()方法是不会执行的，没有任何输出
+
+consoel.log(proxy.age）  //触发get方法，输出
+//true
+//age
+//true
+//undefined 	proxy.age的值为get方法的返回值
+```
+有了这些参数，就可以重建被捕获的原始行为：
+```javascript
+let target = {
+    name: 'lihua',
+    age: 18,
+    array: [1, 2, 6]
+}
+let handler = {
+    get(trapTarget, property, reciver) {
+        return trapTarget[property]
+    }
+}
+let proxy = new Proxy(target, handler)
+console.log(proxy.age) //18
+```
+所有捕获器都可以基于自己的参数重建原始操作，但并非所有捕获器行为都像get()那么简单，因此，通过手写代码如法炮制的想法是不现实的
+
+处理程序对象中所有可以捕获的方法都有对应的反射 **(Reflect)API** 方法，可以向这样定义出**空代理对象**：
+
+```javascript
+let target = {
+    name: 'lihua',
+    age: 18,
+    array: [1, 2, 6]
+}
+let handler = {
+    get(trapTarget, property, reciver) {
+        return Reflect.get(trapTarget, property, reciver)
+    }
+}
+let proxy = new Proxy(target, handler)
+console.log(proxy.age) //18
+```
+甚至`hander`还可以更加简洁：
+```javascript
+let handler = {
+    get: Reflect.get
+}
+```
+## 简单地利用反射处理值
+```javascript
+let target = {
+    word: 'hello'
+}
+let handler = {
+    get() {
+        return Reflect.get(...arguments) + ' world'
+    }
+}
+let proxy = new Proxy(target, handler)
+console.log(proxy.word) //hello world
+```
+## 代理的条件 - 捕获器不变式
+使用捕获其几乎可以改变所有基本方法的行为，但是也不是没有限制。
+
+捕获处理程序的行为必须遵守 **捕获器不变式**。捕获器不变式因方法不同而异
+
+比如，如果目标对象有一个`不可配置且不可写`的数据属性，会抛出**TypeError**
+```javascript
+let target = {
+    word: 'hello'
+}
+Object.defineProperty(target, 'age', {
+    writable: false,  //不可配置
+    configurable: false,  //且不可写
+    value: 48
+})
+let handler = {
+    get() {
+        return Reflect.get(...arguments) + ' world'
+    }
+}
+let proxy = new Proxy(target, handler)
+console.log(proxy.age) 
+//TypeError
+```
+## 可撤销代理
+有时候可能需要中断代理对象与目标的联系，如果用`new Proxy`构造函数创建的对象是无法撤销代理的
+
+Proxy上暴露了一个`revocable`方法，这个工厂方法用于创建代理对象并暴露一个`revoke`撤销方法，**revocable方法的返回值是一个对象，其结构为： {"proxy": proxy, "revoke": revoke}**
+
+`Proxy.revocable`用于撤销代理对象与目标的关联，撤销代理的操作是不可逆的。
+```javascript
+let target = {
+    word: 'hello'
+}
+
+let handler = {
+    get() {
+        return Reflect.get(...arguments) + ' world'
+    }
+}
+let { proxy, revoke } = Proxy.revocable(target, handler)
+console.log(proxy.word) //hello world
+revoke()
+console.log(proxy.word) //TypeError
+```
+## 反射API和对象API
+在使用反射API时，要记住：
++ 反射API并不限于捕获处理程序
++ 大多数反射API方法在Object类型上都有对应方法
+
+通常，Object上的方法用于通用程序，而反射方法适用于细粒度的对象控制与操作
+
+**1.状态标记：**
+	
+很多反射方法返回称作“状态标记”的布尔值，表示意图执行的操作是否	成功。有时候，状态标记比那些可能抛出错误的方法更加有用
+```javascript
+let o = {}
+Object.freeze(o)
+try {
+    Object.defineProperty(o, 'name', { value: 'lihua' })
+} catch (error) {
+    console.log('error')
+}
+//error
+```
+用反射API重构
+```javascript
+const o = {}
+Object.freeze(o)
+if (Reflect.defineProperty(o, 'name', { value: 'lihua' })) {
+    console.log('success')
+} else {
+    console.log('fail')
+}
+//fail
+```
+以下反射方法都会提供状态标记
+```javascript
+Reflect.defineProperty()
+Reflect.preventExtensions()
+Reflect.setPrototypeOf()
+Reflect.set()
+Reflect.deleteProperty()
+```
+**2.用一等函数替代操作符**
+
+以下反射方法提供只有操作符才能完成的操作
+
+**Reflect.get()**: 可以替代对象属性访问操作法
+
+**Reflect.set()**: 可以替代 `=` 赋值操作符
+
+**Reflect.has()**: 可以替代` in` 操作符或 `with()`
+
+**Reflect.deleteProperty()**: 可以替代`delete`操作符
+
+**Reflect.construct()**: 可以替代`new`操作符
+
+示例：
+```javascript
+let o = {
+    name: 'ming'
+}
+// Reflect.get(): 可以替代对象属性访问操作法
+console.log(Reflect.get(o, 'name'))  //ming
+
+// Reflect.set(): 可以替代=赋值操作符
+Reflect.set(o, 'age', 18)  
+
+// Reflect.has(): 可以替代 in 操作符或 with()
+console.log(Reflect.has(o, 'age'))  //true
+
+// Reflect.deleteProperty(): 可以替代delete操作符
+console.log(Reflect.deleteProperty(o, 'name')) //true
+
+// Reflect.construct(): 可以替代new操作符
+console.log(Reflect.construct(Array, [2, 5, 6])) //[ 2, 5, 6 ]
+```
+## 代理另一个代理
+代理可以拦截反射API的操作，而这意味着完全可以创建一个代理对象去代理另一个代理对象，这样就可以在目标对象上构建多层拦截网
+```javascript
+let target = {
+    name: 'lihua'
+}
+
+let firstProxy = new Proxy(target, {
+    get() {
+        console.log('first proxy')
+        return Reflect.get(...arguments)
+    }
+})
+
+let secondProxy = new Proxy(firstProxy, {
+    get() {
+        console.log('second proxy')
+        return Reflect.get(...arguments)
+    }
+})
+
+console.log(secondProxy.name)
+//second proxy
+//first proxy
+//lihua
+```
+
+## 代理的问题与不足
+代理是在**ECMAScript**现有的基础上构建起来的一套新API，因此其实已经尽力做到最好了。但是某些情况下，代理也不能与现在的**ECMAScript**机制很好的协同
+
+**1.代理中的this**
+
+代理现在的一个问题来源是this值。
+```javascript
+let target = {
+    thisVal() {
+        console.log(this === proxy)
+        console.log(this === target)
+    }
+}
+let proxy = new Proxy(target, {})
+proxy.thisVal()
+// true
+// false
+target.thisVal()
+// false 
+// true
+```
+多数情况下，这是符合预期的行为。可是如果目标对象依赖于对象标识，那就可能碰到意料之外的情况，来看一个稍微转个弯的例子：
+```javascript
+const wm = new WeakMap()
+
+class User {
+    constructor(userId) {
+        wm.set(this, userId)
+    }
+    set id(userId) {
+        wm.set(this, userId)
+    }
+    get id() {
+        return wm.get(this)
+    }
+}
+const user = new User(123)
+const proxy = new Proxy(user, {})	//两次访问的this是不同的
+console.log(proxy.id) 
+//undefined
+```
+这是因为`User`实例一开始使用目标对象作为**WeakMap**的键，代理对象却尝试从自身取得这个实例。
+
+要解决这个问题，就要重新配置代理，把代理`User`实例改为代理`User`类本身。之后再创建代理的实例就会以这个代理实例作为**WeakMap**的键了
+```javascript
+const wm = new WeakMap()
+
+class User {
+    constructor(userId) {
+        wm.set(this, userId)
+    }
+    set id(userId) {
+        wm.set(this, userId)
+    }
+    get id() {
+        return wm.get(this)
+    }
+}
+
+const UserClassProxy = new Proxy(User, {})
+const proxyUser = new UserClassProxy(123)
+console.log(proxyUser.id) //123
+```

@@ -95,43 +95,14 @@ module.exports = {
         [
             '@docusaurus/plugin-content-blog',
             {
-                /**
-                 * 此参数对于任何支持多实例的插件都需要
-                 */
-                id: 'element',
-                /**
-                 * URL route for the blog section of your site.
-                 * *不要* 在末尾添加斜线（/）
-                 */
-                routeBasePath: '/element',
-                /**
-                 * 指向存放博客文章的目录的路径。相对于网站根目录。
-                 */
-                path: './element',
-            },
-        ],
-        [
-            '@docusaurus/plugin-content-blog',
-            {
-                id: 'antDesign',
-                routeBasePath: '/antDesign',
-                path: './antDesign',
-            },
-        ],
-        [
-            '@docusaurus/plugin-content-blog',
-            {
-                id: 'vue',
-                routeBasePath: '/vue2',
-                path: './vue2',
-            },
-        ],
-        [
-            '@docusaurus/plugin-content-blog',
-            {
                 id: 'gossip',
                 routeBasePath: '/gossip',
                 path: './gossip',
+                // blog: {
+                //     blogTitle: 'Docusaurus 博客！',
+                //     blogDescription: '这是个用 Docusaurus 搭建的博客！',
+                postsPerPage: 'ALL',
+                // },
             },
         ],
     ],
