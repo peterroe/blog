@@ -1,8 +1,11 @@
+// @ts-check
+// Note: type annotations allow type checking and IDEs autocompletion
+
 const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
-/** @type {import('@docusaurus/types').DocusaurusConfig} */
-module.exports = {
+/** @type {import('@docusaurus/types').Config} */
+const config = {
     title: 'My Site',
     tagline: 'Dinosaurs are cool',
     url: 'https://your-docusaurus-test-site.com',
@@ -12,7 +15,33 @@ module.exports = {
     favicon: 'img/favicon.ico',
     organizationName: 'facebook', // Usually your GitHub org/user name.
     projectName: 'docusaurus', // Usually your repo name.
-    themeConfig: {
+
+    presets: [
+        [
+            '@docusaurus/preset-classic',
+            /** @type {import('@docusaurus/preset-classic').Options} */
+            ({
+                docs: {
+                    sidebarPath: require.resolve('./sidebars.js'),
+                    // Please change this to your repo.
+                    editUrl: 'https://github.com/facebook/docusaurus/edit/main/website/',
+                },
+                blog: {
+                    showReadingTime: true,
+                    postsPerPage: 'ALL',
+                    blogSidebarCount: 'ALL',
+                    editUrl: 'https://github.com/facebook/docusaurus/edit/main/website/blog/',
+                },
+                theme: {
+                    customCss: require.resolve('./src/css/custom.css'),
+                },
+            }),
+        ],
+    ],
+
+    themeConfig:
+    /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
+        ({
         navbar: {
             title: 'Front End',
             logo: {
@@ -23,10 +52,14 @@ module.exports = {
                     type: 'doc',
                     docId: 'intro',
                     position: 'left',
-                    label: '前端技术',
+                    label: '介绍',
                 },
-                // { to: '/blog', label: 'Blog', position: 'left' },
-                { to: '/gossip', label: '生活与创作', position: 'left' },
+                { to: '/blog', label: '前端技术', position: 'left' },
+                {
+                    href: 'https://github.com/peterroe',
+                    label: 'GitHub',
+                    position: 'right',
+                },
             ],
         },
         footer: {
@@ -34,11 +67,11 @@ module.exports = {
             links: [{
                     title: 'Docs',
                     items: [{
-                        label: '前端技术',
+                        label: '介绍',
                         to: '/docs/intro',
                     }, {
-                        label: '生活与创作',
-                        to: '/gossip',
+                        label: '前端技术',
+                        to: '/blog',
                     }],
                 },
                 {
@@ -62,48 +95,7 @@ module.exports = {
             theme: lightCodeTheme,
             darkTheme: darkCodeTheme,
         },
-    },
-    themes: [
-        '@docusaurus/theme-live-codeblock'
-    ],
-    presets: [
-        [
-            '@docusaurus/preset-classic',
-            {
-                docs: {
-                    sidebarPath: require.resolve('./sidebars.js'),
-                    // Please change this to your repo.
-                    editUrl: 'https://github.com/facebook/docusaurus/edit/main/website/',
-                },
-                blog: {
-                    showReadingTime: true,
-                    // Please change this to your repo.
-                    editUrl: 'https://github.com/facebook/docusaurus/edit/main/website/blog/',
-                },
-                gossip: {
-                    showReadingTime: true,
-                    // Please change this to your repo.
-                    editUrl: 'https://github.com/facebook/docusaurus/edit/main/website/blog/',
-                },
-                theme: {
-                    customCss: require.resolve('./src/css/custom.css'),
-                },
-            },
-        ],
-    ],
-    plugins: [
-        [
-            '@docusaurus/plugin-content-blog',
-            {
-                id: 'gossip',
-                routeBasePath: '/gossip',
-                path: './gossip',
-                // blog: {
-                //     blogTitle: 'Docusaurus 博客！',
-                //     blogDescription: '这是个用 Docusaurus 搭建的博客！',
-                postsPerPage: 'ALL',
-                // },
-            },
-        ],
-    ],
+    }),
 };
+
+module.exports = config;

@@ -1,10 +1,3 @@
-/*
- * @Descripttion: 
- * @Author: 林舒恒
- * @Date: 2021-09-01 19:30:20
- * @LastEditors: 林舒恒
- * @LastEditTime: 2021-09-07 20:26:16
- */
 import React from 'react';
 import clsx from 'clsx';
 import Layout from '@theme/Layout';

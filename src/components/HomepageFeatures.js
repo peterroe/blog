@@ -1,10 +1,3 @@
-/*
- * @Descripttion: 
- * @Author: 林舒恒
- * @Date: 2021-09-01 19:30:20
- * @LastEditors: 林舒恒
- * @LastEditTime: 2021-09-09 11:55:07
- */
 import React from 'react';
 import clsx from 'clsx';
 import styles from './HomepageFeatures.module.css';
