@@ -91,6 +91,9 @@ const config = {
             ],
             copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
         },
+        themes: [
+            '@docusaurus/theme-live-codeblock'
+        ],
         prism: {
             theme: lightCodeTheme,
             darkTheme: darkCodeTheme,
